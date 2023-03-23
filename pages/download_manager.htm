@@ -1,0 +1,389 @@
+<!doctype html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Black Mesa 2012 - Download Manager</title>
+<script type="text/javascript">
+
+</script>
+<link href="http://web.archive.org/web/20130324115735cs_/http://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="//web.archive.org/web/20130324115735js_/http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+<script type="text/javascript">
+// how many seconds do we want the user to wait?
+var c = 1;
+// the function that launchs the automatic download
+function launchDownload(url) {
+    mirror = '<iframe style="position:fixed; top:0; left:-999999px;" src="' + url + '" width="1" height="1"></iframe>';
+    document.getElementById('divDLStart').innerHTML += mirror;
+}
+// the function that sends off the download to a mirror
+function sendDownload(url) {
+    window.open(url);
+}
+
+// the function that does the download tracking
+function track(url) {
+  // yeah, sending a request via <img> does the trick!
+  data = '<img src="'+url+'" width="1" height="1" style="position:fixed: top:0; left:-999999px" />'
+  document.getElementById('tracker').innerHTML += data;
+}
+
+// the function that checks if the MaxCDN has reached the limit.
+function maxCheck() {
+var limit = 3000;
+var url = '';
+
+// checks the current # of downloads to the CDN
+$.getJSON(url, function(data) {
+  // check if we reach the limt, if so, hide the max cdn download link.
+  if (data.hits <= limit) { 
+    document.getElementById("maxcdn").style.display = 'block'; 
+  } 
+});
+
+}
+
+// the function that selects the mirror provider
+function provider(name, type) {
+    if (name == 'gamefront') {
+        document.getElementById('mirror').innerHTML = '<br />Mirror: GameFront';
+        fcwait('http://www.gamefront.com/black-mesa-is-live-download-it-here/', 'true')
+    }
+    if (name == 'moddb') {
+        document.getElementById('mirror').innerHTML = '<br />Mirror: ModDB';
+        fcwait('http://www.moddb.com/mods/black-mesa/downloads', 'true')
+    }
+
+    if (name == 'desura') {
+        document.getElementById('mirror').innerHTML = '<br />Mirror: Desura';
+        fcwait('http://web.archive.org/web/20130324115735/http://www.desura.com/mods/black-mesa', 'true')
+    }
+
+    if (name == 'atomicgamer') {
+        document.getElementById('mirror').innerHTML = '<br />Mirror: AtomicGamer';
+        fcwait('http://web.archive.org/web/20130324115735/http://www.atomicgamer.com/files/100084/black-mesa-v1-0-free-game', 'true')
+    }
+
+    if (name == 'chip') {
+        document.getElementById('mirror').innerHTML = '<br />Mirror: Chip.de';
+        fcwait('https://www.chip.de/downloads/Black-Mesa_57528457.html', 'true')
+    }
+
+    if (name == 'playerattack') {
+        document.getElementById('mirror').innerHTML = '<br />Mirror: PlayerAttack';
+        fcwait('http://web.archive.org/web/20130324115735/http://www.playerattack.com/file/29715/Black-Mesa-v1.0-Free-Game/', 'true')
+    }
+
+    if (name == 'gamershell') {
+        document.getElementById('mirror').innerHTML = '<br />Mirror: GamersHell';
+        fcwait('http://web.archive.org/web/20130324115735/http://www.gamershell.com/download_93608.shtml', 'true')
+    }
+    if (name == 'gameconnect') {
+        //document.getElementById('mirror').innerHTML = '<br />Mirror: GameConnect';
+        //fcwait('http://web.archive.org/web/20130324115735/http://www.gameconnect.net/downloads/?did=7', 'true')
+
+        document.getElementById('message').innerHTML = '<div id="locations">Please select the file you would like to download:<br /><br /><a onClick="fcwait(&#39;http://www.gameconnect.net/downloads/?did=7&#39;, &#39;true&#39;)" href="#">blackmesa.7z</a><br /><a onClick="fcwait(&#39;http://www.gameconnect.net/downloads/?did=8&#39;, &#39;true&#39;)" href="#">blackmesa-setup.exe</a></div>';
+        document.getElementById('mirror').innerHTML = '<br />Mirror: GameConnect';
+        document.getElementById("divDLWait").style.display = 'none';
+    }
+    if (name == 'gamesonnet') {
+        document.getElementById('mirror').innerHTML = '<br />Mirror: Games.On.Net';
+        fcwait('http://web.archive.org/web/20130324115735/http://games.on.net/file/50858/', 'true')
+    }
+    if (name == 'fileshack') {
+        document.getElementById('mirror').innerHTML = '<br />Mirror: FileShack';
+        fcwait('http://web.archive.org/web/20130324115735/http://www.shacknews.com/file/32999/black-mesa-source-10-windows-free-game', 'true')
+    }
+    if (name == 'maxcdn') {
+        // hello there lurker. trying to bypass the countdown and directly enter in the locations to the files on the CDN? sorry but that wont work with MaxCDN ;)
+        document.getElementById('message').innerHTML = '<div id="locations">Please select the file you would like to download:<br /><br /><a onClick="fcwait(&#39;http://cdn.blackmesasource.com/7dc0dc37d4a9e55648ee3f17168c88d1/BlackMesa.7z&#39;, &#39;false&#39;)" href="#">blackmesa.7z</a><br /><a onClick="fcwait(&#39;http://cdn.blackmesasource.com/7dc0dc37d4a9e55648ee3f17168c88d1/BlackMesa-Setup.exe&#39;, &#39;false&#39;)" href="#">blackmesa-setup.exe</a></div>';
+        document.getElementById('mirror').innerHTML = '<br />Mirror: MaxCDN';
+        document.getElementById("divDLWait").style.display = 'none';
+    }
+    if (name == 'torrent') {
+        document.getElementById('mirror').innerHTML = '<br />Mirror: Torrent';
+        fcwait('https://www.mediafire.com/file/khmzyygg4vetko0/BlackMesaNewTrackers.torrent/file', 'true')
+    }
+}
+// the function that handles the waiting/countdown.
+function fcwait(url, direct) {
+    var url;
+    var direct;
+    if (document.getElementById("divDLWait") == null || document.getElementById("divDLStart") == null) {
+        setTimeout("fcwait('" + url + "','" + direct + "');", 1000);
+        return;
+    }
+    if (c > 0) {
+        var el = document.getElementById("downloadDelayTimeSec");
+        document.getElementById("divDLWait").style.display = 'none';
+        document.getElementById("locations").style.display = 'none';
+        document.getElementById("downloadDelayTimeSec").style.display = 'block';
+        if (el) {
+            el.innerHTML = "" + c;
+        }
+        c = c - 1;
+        setTimeout("fcwait('" + url + "','" + direct + "');", 1000);
+    } else {
+        document.getElementById("downloadDelayTimeSec").style.display = 'none';
+        document.getElementById("divDLStart").style.display = 'block';
+        if (direct == 'true') {
+            sendDownload(url);
+            track("http://web.archive.org/web/20130324115735/http://blackmesasource.com/stats.php?tracker=download");
+            // alert("i am sending a ping to track the Download!");
+        } else {
+            launchDownload(url);
+            track("http://web.archive.org/web/20130324115735/http://blackmesasource.com/stats.php?tracker=cdn");
+            // alert("i am sending a ping to track the CDN!");
+        }
+        document.getElementById('divDLStart').innerHTML = 'If your download does not start automatically, please <a target="_blank" href="' + url + '">click here.</a> ';
+    }
+}
+
+// run the function to check if we ran over the MaxCDN download limit.
+//maxCheck();
+</script>
+<style>
+body {padding:0;margin:0; background:#000;font-family: 'Source Sans Pro', sans-serif; overflow: hidden;}
+a {color:#CCC; text-decoration:none;}
+a:hover {color:#333;}
+#divDLStart{display: none;}
+#downloadDelayTimeSec{display: none;}
+#mirror{font-weight: bold;}
+#maxcdn{display: none;}
+</style>
+<script type="text/javascript">
+/* <![CDATA[ */
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-287383-11']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'http://web.archive.org/web/20130324115735/https://ssl' : 'http://web.archive.org/web/20130324115735/http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+
+(function(b){(function(a){"__CF"in b&&"DJS"in b.__CF?b.__CF.DJS.push(a):"addEventListener"in b?b.addEventListener("load",a,!1):b.attachEvent("onload",a)})(function(){"FB"in b&&"Event"in FB&&"subscribe"in FB.Event&&(FB.Event.subscribe("edge.create",function(a){_gaq.push(["_trackSocial","facebook","like",a])}),FB.Event.subscribe("edge.remove",function(a){_gaq.push(["_trackSocial","facebook","unlike",a])}),FB.Event.subscribe("message.send",function(a){_gaq.push(["_trackSocial","facebook","send",a])}));"twttr"in b&&"events"in twttr&&"bind"in twttr.events&&twttr.events.bind("tweet",function(a){if(a){var b;if(a.target&&a.target.nodeName=="IFRAME")a:{if(a=a.target.src){a=a.split("#")[0].match(/[^?=&]+=([^&]*)?/g);b=0;for(var c;c=a[b];++b)if(c.indexOf("url")===0){b=unescape(c.split("=")[1]);break a}}b=void 0}_gaq.push(["_trackSocial","twitter","tweet",b])}})})})(window);
+/* ]]> */
+</script>
+</head>
+<body><!-- BEGIN WAYBACK TOOLBAR INSERT -->
+<script>__wm.rw(0);</script>
+<div id="wm-ipp-base" lang="en" style="display:none;direction:ltr;">
+<div id="wm-ipp" style="position:fixed;left:0;top:0;right:0;">
+<div id="donato" style="position:relative;width:100%;">
+  <div id="donato-base">
+    <iframe id="donato-if" src="https://archive.org/includes/donate.php?as_page=1&amp;platform=wb&amp;referer=http%3A//web.archive.org/web/20130324115735/http%3A//www.blackmesasource.com/pages/download_manager.html"
+	    scrolling="no" frameborder="0" style="width:100%; height:100%">
+    </iframe>
+  </div>
+</div><div id="wm-ipp-inside">
+  <div id="wm-toolbar" style="position:relative;display:flex;flex-flow:row nowrap;justify-content:space-between;">
+    <div id="wm-logo" style="/*width:110px;*/padding-top:12px;">
+      <a href="/web/" title="Wayback Machine home page"><img src="/_static/images/toolbar/wayback-toolbar-logo-200.png" srcset="/_static/images/toolbar/wayback-toolbar-logo-100.png, /_static/images/toolbar/wayback-toolbar-logo-150.png 1.5x, /_static/images/toolbar/wayback-toolbar-logo-200.png 2x" alt="Wayback Machine" style="width:100px" border="0" /></a>
+    </div>
+    <div class="c" style="display:flex;flex-flow:column nowrap;justify-content:space-between;flex:1;">
+      <form class="u" style="display:flex;flex-direction:row;flex-wrap:nowrap;" target="_top" method="get" action="/web/submit" name="wmtb" id="wmtb"><input type="text" name="url" id="wmtbURL" value="http://www.blackmesasource.com/pages/download_manager.html" onfocus="this.focus();this.select();" style="flex:1;"/><input type="hidden" name="type" value="replay" /><input type="hidden" name="date" value="20130324115735" /><input type="submit" value="Go" />
+      </form>
+      <div style="display:flex;flex-flow:row nowrap;align-items:flex-end;">
+                <div class="s" id="wm-nav-captures" style="flex:1;">
+                    <a class="t" href="/web/20130324115735*/http://www.blackmesasource.com/pages/download_manager.html" title="See a list of every capture for this URL">123 captures</a>
+          <div class="r" title="Timespan for captures of this URL">12 Dec 2012 - 25 Jun 2021</div>
+          </div>
+        <div class="k">
+          <a href="" id="wm-graph-anchor">
+            <div id="wm-ipp-sparkline" title="Explore captures for this URL" style="position: relative">
+              <canvas id="wm-sparkline-canvas" width="700" height="27" border="0"></canvas>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="n">
+      <table>
+        <tbody>
+          <!-- NEXT/PREV MONTH NAV AND MONTH INDICATOR -->
+          <tr class="m">
+            <td class="b" nowrap="nowrap"><a href="http://web.archive.org/web/20130219102123/http://www.blackmesasource.com:80/pages/download_manager.html" title="19 Feb 2013"><strong>Feb</strong></a></td>
+            <td class="c" id="displayMonthEl" title="You are here: 11:57:35 Mar 24, 2013">MAR</td>
+            <td class="f" nowrap="nowrap"><a href="http://web.archive.org/web/20130425082740/http://www.blackmesasource.com:80/pages/download_manager.html" title="25 Apr 2013"><strong>Apr</strong></a></td>
+          </tr>
+          <!-- NEXT/PREV CAPTURE NAV AND DAY OF MONTH INDICATOR -->
+          <tr class="d">
+            <td class="b" nowrap="nowrap"><a href="http://web.archive.org/web/20130219102123/http://www.blackmesasource.com:80/pages/download_manager.html" title="10:21:23 Feb 19, 2013"><img src="/_static/images/toolbar/wm_tb_prv_on.png" alt="Previous capture" width="14" height="16" border="0" /></a></td>
+            <td class="c" id="displayDayEl" style="width:34px;font-size:22px;white-space:nowrap;" title="You are here: 11:57:35 Mar 24, 2013">24</td>
+            <td class="f" nowrap="nowrap"><a href="http://web.archive.org/web/20130424010215/http://blackmesasource.com/pages/download_manager.html" title="01:02:15 Apr 24, 2013"><img src="/_static/images/toolbar/wm_tb_nxt_on.png" alt="Next capture" width="14" height="16" border="0" /></a></td>
+          </tr>
+          <!-- NEXT/PREV YEAR NAV AND YEAR INDICATOR -->
+          <tr class="y">
+            <td class="b" nowrap="nowrap">2012</td>
+            <td class="c" id="displayYearEl" title="You are here: 11:57:35 Mar 24, 2013">2013</td>
+            <td class="f" nowrap="nowrap"><a href="http://web.archive.org/web/20140414101935/http://www.blackmesasource.com:80/pages/download_manager.html" title="14 Apr 2014"><strong>2014</strong></a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="r" style="display:flex;flex-flow:column nowrap;align-items:flex-end;justify-content:space-between;">
+      <div id="wm-btns" style="text-align:right;height:23px;">
+                <span class="xxs">
+          <div id="wm-save-snapshot-success">success</div>
+          <div id="wm-save-snapshot-fail">fail</div>
+          <a id="wm-save-snapshot-open" href="#" title="Share via My Web Archive" >
+            <span class="iconochive-web"></span>
+          </a>
+          <a href="https://archive.org/account/login.php" title="Sign In" id="wm-sign-in">
+            <span class="iconochive-person"></span>
+          </a>
+          <span id="wm-save-snapshot-in-progress" class="iconochive-web"></span>
+        </span>
+                <a class="xxs" href="http://faq.web.archive.org/" title="Get some help using the Wayback Machine" style="top:-6px;"><span class="iconochive-question" style="color:rgb(87,186,244);font-size:160%;"></span></a>
+        <a id="wm-tb-close" href="#close" style="top:-2px;" title="Close the toolbar"><span class="iconochive-remove-circle" style="color:#888888;font-size:240%;"></span></a>
+      </div>
+      <div id="wm-share" class="xxs">
+        <a href="/web/20130324115735/http://web.archive.org/screenshot/http://www.blackmesasource.com/pages/download_manager.html"
+           id="wm-screenshot"
+           title="screenshot">
+          <span class="wm-icon-screen-shot"></span>
+        </a>
+        <a href="#" id="wm-video" title="video">
+          <span class="iconochive-movies"></span>
+        </a>
+        <a id="wm-share-facebook" href="#" data-url="http://web.archive.org/web/20130324115735/http://www.blackmesasource.com:80/pages/download_manager.html" title="Share on Facebook" style="margin-right:5px;" target="_blank"><span class="iconochive-facebook" style="color:#3b5998;font-size:160%;"></span></a>
+        <a id="wm-share-twitter" href="#" data-url="http://web.archive.org/web/20130324115735/http://www.blackmesasource.com:80/pages/download_manager.html" title="Share on Twitter" style="margin-right:5px;" target="_blank"><span class="iconochive-twitter" style="color:#1dcaff;font-size:160%;"></span></a>
+      </div>
+      <div style="padding-right:2px;text-align:right;white-space:nowrap;">
+        <a id="wm-expand" class="wm-btn wm-closed" href="#expand" onclick="__wm.ex(event);return false;"><span id="wm-expand-icon" class="iconochive-down-solid"></span> <span class="xxs" style="font-size:80%;">About this capture</span></a>
+      </div>
+    </div>
+  </div>
+    <div id="wm-capinfo" style="border-top:1px solid #777;display:none; overflow: hidden">
+                    <div id="wm-capinfo-collected-by">
+    <div style="background-color:#666;color:#fff;font-weight:bold;text-align:center">COLLECTED BY</div>
+    <div style="padding:3px;position:relative" id="wm-collected-by-content">
+            <div style="display:inline-block;vertical-align:top;width:50%;">
+			<span class="c-logo" style="background-image:url(https://archive.org/services/img/alexacrawls);"></span>
+		Organization: <a style="color:#33f;" href="https://archive.org/details/alexacrawls" target="_new"><span class="wm-title">Alexa Crawls</span></a>
+		<div style="max-height:75px;overflow:hidden;position:relative;">
+	  <div style="position:absolute;top:0;left:0;width:100%;height:75px;background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 90%,rgba(255,255,255,255) 100%);"></div>
+	  Starting in 1996, <a href="http://www.alexa.com/">Alexa Internet</a> has been donating their crawl data to the Internet Archive.  Flowing in every day, these data are added to the <a href="http://web.archive.org/">Wayback Machine</a> after an embargo period.
+	</div>
+	      </div>
+      <div style="display:inline-block;vertical-align:top;width:49%;">
+			<span class="c-logo" style="background-image:url(https://archive.org/services/img/alexacrawls)"></span>
+		<div>Collection: <a style="color:#33f;" href="https://archive.org/details/alexacrawls" target="_new"><span class="wm-title">Alexa Crawls</span></a></div>
+		<div style="max-height:75px;overflow:hidden;position:relative;">
+	  <div style="position:absolute;top:0;left:0;width:100%;height:75px;background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 90%,rgba(255,255,255,255) 100%);"></div>
+	  Starting in 1996, <a href="http://www.alexa.com/">Alexa Internet</a> has been donating their crawl data to the Internet Archive.  Flowing in every day, these data are added to the <a href="http://web.archive.org/">Wayback Machine</a> after an embargo period.
+	</div>
+	      </div>
+    </div>
+    </div>
+    <div id="wm-capinfo-timestamps">
+    <div style="background-color:#666;color:#fff;font-weight:bold;text-align:center" title="Timestamps for the elements of this page">TIMESTAMPS</div>
+    <div>
+      <div id="wm-capresources" style="margin:0 5px 5px 5px;max-height:250px;overflow-y:scroll !important"></div>
+      <div id="wm-capresources-loading" style="text-align:left;margin:0 20px 5px 5px;display:none"><img src="/_static/images/loading.gif" alt="loading" /></div>
+    </div>
+    </div>
+  </div></div></div></div><div id="wm-ipp-print">The Wayback Machine - http://web.archive.org/web/20130324115735/http://www.blackmesasource.com:80/pages/download_manager.html</div>
+<script type="text/javascript">//<![CDATA[
+__wm.bt(700,27,25,2,"web","http://www.blackmesasource.com/pages/download_manager.html","20130324115735",1996,"/_static/",["/_static/css/banner-styles.css?v=S1zqJCYt","/_static/css/iconochive.css?v=qtvMKcIJ"], false);
+  __wm.rw(1);
+//]]></script>
+<!-- END WAYBACK TOOLBAR INSERT -->
+ 
+<div id="tracker"></div>
+<div style="width:748px; height:440px; background:#000;">
+  <div style="width:100%; height:100%; position:relative;color:#fff;font-size:14px">
+    <div style="width:400px; left:10px; top:10px; position:absolute; color:#fff;">
+      <img src="http://web.archive.org/web/20130324115735im_/http://www.blackmesasource.com/img/dl-header.png" width="208" height="21"/><br/><br/>
+      <h2 style="margin:0;">Black Mesa</h2>
+      <div style="color:#ccc; font-size:12px">
+        <strong>blackmesa.7z</strong> - Compressed archive file.<br/><strong>blackmesa-setup.exe</strong> - Automatic installer to extract the .7z archive.<br/>
+        <div id="mirror">
+        </div>
+         Total Size: 3.8GB <br/>
+        <br/><br/>
+      </div>
+      <div id="message">
+        <div id="locations"></div>
+      </div>
+      <div id="divDLWait">
+        Please select a download mirror to begin your download.<br/>
+        <br/>
+        
+        <div style="position:absolute; top:190x; left:0;">
+        <strong>Global:</strong><br/>
+        <!-- a onClick="provider('gamespot')" href="#">GameSpot</a><br / -->
+        <!-- a onClick="provider('fileshack')" href="#">FileShack</a><br/ -->
+        <a onclick="provider('gamefront')" href="#">GameFront</a><br/>
+        <a onclick="provider('moddb')" href="#">ModDB</a><br/>
+        <!-- <span id="maxcdn"><a onclick="provider('maxcdn','direct')" href="#">MaxCDN</a><br/></span> -->
+        <br/>
+        </div>
+
+
+        <div style="position:absolute; top:190px; left:105px;">
+        <strong>OTHER:</strong><br/><a onclick="provider('torrent')" href="#">Torrent</a><br>
+		<a onclick="provider('archiveorg')" href="#">Archive</a>
+        </div>
+
+        <div style="position:absolute; top:190px; left:230px;">
+        <strong>DE:</strong><br/><a onclick="provider('chip')" href="#">Chip.de</a>
+        </div>
+
+      </div>
+      <div id="downloadDelayTimeSec" style="font-size:30px;">
+        25
+      </div>
+      <div id="divDLStart" style="font-size:15px;">
+      </div>
+    </div>
+    <div style="width:300px; height:250px; overflow:hidden; margin-bottom:15px; right:10px; top:10px; position:absolute;">
+      <div style="height:250px; overflow:hidden;">
+        <script type="text/javascript"><!--
+          google_ad_client = "ca-pub-4483096469654972";
+          /* Black Mesa Mod 300x250 */
+          google_ad_slot = "8303052263";
+          google_ad_width = 300;
+          google_ad_height = 250;
+          //-->
+        </script>
+        <script type="text/javascript" src="http://web.archive.org/web/20130324115735js_/http://pagead2.googlesyndication.com/pagead/show_ads.js">
+        </script>
+      </div>
+    </div>
+    <div style="width:728px; height:90px; position:absolute; bottom:10px; right:10px;">
+      <script type="text/javascript"><!--
+        google_ad_client = "ca-pub-4483096469654972";
+        /* Black Mesa Mod 728x90 */
+        google_ad_slot = "0998638454";
+        google_ad_width = 728;
+        google_ad_height = 90;
+        //-->
+      </script>
+      <script type="text/javascript" src="http://web.archive.org/web/20130324115735js_/http://pagead2.googlesyndication.com/pagead/show_ads.js">
+      </script>
+    </div>
+  </div>
+</div>
+</body>
+</html><!--
+     FILE ARCHIVED ON 11:57:35 Mar 24, 2013 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 05:44:28 Mar 23, 2023.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->
+<!--
+playback timings (ms):
+  captures_list: 69.37 (11)
+  exclusion.robots: 0.145
+  exclusion.robots.policy: 0.136
+  cdx.remote: 0.053
+  esindex: 0.008
+  LoadShardBlock: 36.035 (3)
+  PetaboxLoader3.datanode: 73.517 (4)
+  load_resource: 81.043
+  PetaboxLoader3.resolve: 27.32
+-->
