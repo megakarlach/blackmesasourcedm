@@ -7,7 +7,7 @@ The Following mirrors are available: GameFront, ModDB, Torrent, Chip.de
 Visit it here:<br>
 https://kr0tchet.github.io/blackmesasourcedm/pages/download_manager.htm
 
-
+Defninitive Edition is also included below the page.
 
 Originally made by<br>
 © 2012-2023 Crowbar Collective, Inc. All rights reserved.
