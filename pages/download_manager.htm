@@ -46,7 +46,7 @@ $.getJSON(url, function(data) {
 function provider(name, type) {
     if (name == 'gamefront') {
         document.getElementById('mirror').innerHTML = '<br />Mirror: GameFront';
-        fcwait('https://www.gamefront.com/games/half-life-2/file/black-mesa-1', 'true')
+        fcwait('https://www.gamefront.com/games/half-life-2/file/black-mesa-1', 'false')
     }
     if (name == 'moddb') {
         document.getElementById('mirror').innerHTML = '<br />Mirror: ModDB';
@@ -170,7 +170,7 @@ a:hover {color:#333;}
         <div id="locations"></div>
       </div>
       <div id="divDLWait">
-        Please select a download mirror to begin your download.<br>Some mirrors that host the original 2012 version are no longer available.<br> <!-- Most mirrors have been removed because they have been shutdown or redirected into another page. -->
+        Please select a download mirror to begin your download.<br>Some mirrors that host the original 2012 version are no longer available,<br> or site like GameFront may give you something else (like blackmesa.bsp for original Half-Life) other than the actual mod itself.<br> <!-- Most mirrors have been removed because they have been shutdown or redirected into another page. -->
         <br>
         
         <div style="position:absolute; top:190x; left:0;">
