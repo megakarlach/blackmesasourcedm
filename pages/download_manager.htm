@@ -46,7 +46,7 @@ $.getJSON(url, function(data) {
 function provider(name, type) {
     if (name == 'gamefront') {
         document.getElementById('mirror').innerHTML = '<br />Mirror: GameFront';
-        fcwait('https://www.gamefront.com/games/half-life-2/file/black-mesa-1', 'false')
+        fcwait('https://www.gamefront.com/games/half-life-2/file/black-mesa-1', 'true')
     }
     if (name == 'moddb') {
         document.getElementById('mirror').innerHTML = '<br />Mirror: ModDB';
@@ -177,18 +177,18 @@ a:hover {color:#333;}
         <strong>Global:</strong><br>
         <!-- a onClick="provider('gamespot')" href="#">GameSpot</a><br / -->
         <!-- a onClick="provider('fileshack')" href="#">FileShack</a><br/ -->
-        <a onclick="provider('gamefront')" href="#">GameFront</a><br>
+        <a onclick="provider('gamefront')" href="#">GameFront (unavailable)</a><br>
         <a onclick="provider('moddb')" href="#">ModDB</a><br>
         <!-- <span id="maxcdn"><a onclick="provider('maxcdn','direct')" href="#">MaxCDN</a><br/></span> -->
         <br>
         </div>
           
         <div style="position:absolute; top:190px; left:105px;">
-        <strong>TORRENT:</strong><br><a onclick="provider('torrent')" href="#">Torrent</a><br>
+        <strong>TORRENT:</strong><br><br><a onclick="provider('torrent')" href="#">Torrent</a><br>
         </div>
         
         <div style="position:absolute; top:190px; left:230px;">
-        <strong>DE:</strong><br><a onclick="provider('chip')" href="#">Chip.de</a>
+        <strong>DE:</strong><br><br><a onclick="provider('chip')" href="#">Chip.de</a>
         </div>
 
       </div>
