@@ -45,7 +45,7 @@ $.getJSON(url, function(data) {
 // the function that selects the mirror provider
 function provider(name, type) {
     if (name == 'gamefront') {
-        document.getElementById('mirror').innerHTML = '<br />Mirror: GameFront';
+        document.getElementById('mirror').innerHTML = '<br />Mirror: GameFront (WARNING: May give you wrong file)';
         fcwait('https://www.gamefront.com/games/half-life-2/file/black-mesa-1', 'true')
     }
     if (name == 'moddb') {
@@ -177,7 +177,7 @@ a:hover {color:#333;}
         <strong>Global:</strong><br>
         <!-- a onClick="provider('gamespot')" href="#">GameSpot</a><br / -->
         <!-- a onClick="provider('fileshack')" href="#">FileShack</a><br/ -->
-        <a onclick="provider('gamefront')" href="#">GameFront (unavailable)</a><br>
+        <a onclick="provider('gamefront')" href="#"><s>GameFront</s></a><br>
         <a onclick="provider('moddb')" href="#">ModDB</a><br>
         <!-- <span id="maxcdn"><a onclick="provider('maxcdn','direct')" href="#">MaxCDN</a><br/></span> -->
         <br>
