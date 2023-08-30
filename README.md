@@ -7,7 +7,7 @@ The Following mirrors are available: <s>GameFront</s>, ModDB, Torrent, Chip.de
 GameFront links are available but the website has been redesigned, which ended up breaking the links. Instead of giving you the actual game, it's give you a map for the original HL instead.
 
 Visit it here:<br>
-https://kr0tchet.github.io/blackmesasourcedm/pages/download_manager.htm
+https://megakarlach.github.io/blackmesasourcedm/pages/download_manager.htm
 
 Defninitive Edition is also included below the page.
 
